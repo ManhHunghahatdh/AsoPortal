@@ -1,0 +1,26 @@
+﻿@{
+    Layout = "~/Views/Shared/_ColumnsOne.cshtml";
+
+    //page class
+    Html.AppendPageCssClassParts("html-home-page");
+}
+@section  Banner{
+<section class="banner">
+    <div class="container_aso">
+        <h1 class="hero__title">@T("Banner_title")</h1>
+        <p class="hero__text"></p>@T("Banner_descaption")</p>
+        <p></p>
+        <a href="about-us" class="button banner-link">@T("Banner_link")</a>
+    </div>
+</section>
+}
+<div class="page home-page">
+    <div class="page-body">
+        @Html.Widget("home_page_top")
+        @Html.Widget("home_page_before_news")
+        @Html.Action("HomePageNews", "News")
+        @Html.Widget("GetWidget_linhvuc")
+        @Html.Widget("GetWidget_download_aso")
+        @Html.Widget("home_page_bottom")
+    </div>
+</div>

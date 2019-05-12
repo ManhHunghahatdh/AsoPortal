@@ -1,0 +1,210 @@
+﻿@model ProductDetailsModel
+@using Nop.Core.Domain.Seo;
+@using Nop.Core.Infrastructure;
+@using Nop.Web.Models.Catalog;
+@{
+    Layout = "~/Views/Shared/_ColumnsOne.cshtml";
+
+    //title
+    Html.AddTitleParts(!String.IsNullOrEmpty(Model.MetaTitle) ? Model.MetaTitle : Model.Name);
+    //meta
+    Html.AddMetaDescriptionParts(Model.MetaDescription);
+    Html.AddMetaKeywordParts(Model.MetaKeywords);
+    //page class
+    Html.AppendPageCssClassParts("html-product-details-page");
+
+    var seoSettings = EngineContext.Current.Resolve<SeoSettings>();
+
+    //canonical URL
+    if (seoSettings.CanonicalUrlsEnabled)
+    {
+        var productUrl = Url.RouteUrl("Product", new { SeName = Model.SeName }, this.Request.Url.Scheme);
+        Html.AddCanonicalUrlParts(productUrl);
+    }
+
+    //open graph META tags
+    if (seoSettings.OpenGraphMetaTags)
+    {
+        Html.AddHeadCustomParts("<meta property=\"og:type\" content=\"product\" />");
+        Html.AddHeadCustomParts("<meta property=\"og:title\" content=\"" + Html.Encode(Model.Name) + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"og:description\" content=\"" + Html.Encode(Nop.Core.Html.HtmlHelper.StripTags(Model.MetaDescription)) + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"og:image\" content=\"" + Model.DefaultPictureModel.ImageUrl + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"og:url\" content=\"" + Request.Url.AbsoluteUri + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"og:site_name\" content=\"" + Html.Encode(Model.CurrentStoreName) + "\" />");
+    }
+
+    //Twitter META tags
+    if (seoSettings.TwitterMetaTags)
+    {
+        Html.AddHeadCustomParts("<meta property=\"twitter:card\" content=\"summary\" />");
+        Html.AddHeadCustomParts("<meta property=\"twitter:site\" content=\"" + Html.Encode(Model.CurrentStoreName) + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"twitter:title\" content=\"" + Html.Encode(Model.Name) + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"twitter:description\" content=\"" + Html.Encode(Nop.Core.Html.HtmlHelper.StripTags(Model.MetaDescription)) + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"twitter:image\" content=\"" + Model.DefaultPictureModel.ImageUrl + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"twitter:url\" content=\"" + Request.Url.AbsoluteUri + "\" />");
+    }
+}
+<!--product breadcrumb-->
+@section Breadcrumb
+{
+    @Html.Partial("_ProductBreadcrumb", Model.Breadcrumb)
+}
+@Html.Widget("productdetails_after_breadcrumb", Model.Id)
+
+@section Breadcrumb_line {
+    <div class="headtitle">
+        <div class="container_aso">
+            <h2 class="title">@Model.Name</h2>
+        </div>
+    </div>
+}
+<div class="page product-details-page">
+    <div class="page-body">
+        @Html.Widget("productdetails_top", Model.Id)
+        @using (Html.BeginRouteForm("Product", new { SeName = Model.SeName }, FormMethod.Post, new { id = "product-details-form" }))
+        {
+            <div itemscope itemtype="http://schema.org/Product" data-productid="@Model.Id">
+                <div class="product-essential">
+                    
+                    <div class="overview">
+                        @Html.Partial("_Discontinued", Model)
+                        <div class="product-name">
+                            <h1 itemprop="name">
+                                @Model.Name
+                            </h1>
+                        </div>
+                        @if (!String.IsNullOrEmpty(Model.ShortDescription))
+                        {
+                            <div class="short-description">
+                                @Html.Raw(Model.ShortDescription)
+                            </div>
+                        }
+                        @Html.Widget("productdetails_overview_top", Model.Id)
+                        <!--product reviews-->
+                        @Html.Partial("_ProductReviewOverview", Model.ProductReviewOverview)
+                        <!--manufacturers-->
+                        @Html.Partial("_ProductManufacturers", Model.ProductManufacturers)
+                        @Html.Widget("productdetails_overview_bottom", Model.Id)
+                    </div>
+                    
+                    <!--product pictures-->
+                    @Html.Widget("productdetails_before_pictures", Model.Id)
+                    @Html.Partial("_ProductDetailsPictures", Model)
+                    @Html.Widget("productdetails_after_pictures", Model.Id)
+
+                    <div class="well tabsdt" id="tab-product">
+                        <ul class="nav nav-tabs">
+                            @if (!String.IsNullOrEmpty(Model.FullDescription)){<li class="active"><a href="#tab_detail1" data-toggle="tab">@T("tab-1")</a></li>}
+                           @if (!String.IsNullOrEmpty(Model.Specifications)){ <li><a href="#tab_detail2" data-toggle="tab">@T("Tab-2")</a></li>}
+                           @if (Model.PictureModels != null) { <li><a href="#tab_detail3" data-toggle="tab">@T("Tab-3")</a></li>}
+                            @if (Model.HasSampleDownload) { <li><a href="#tab_detail4" data-toggle="tab">@T("Tab-4")</a></li>}
+                            @if (!String.IsNullOrEmpty(Model.Applications)) {<li><a href="#tab_detail5" data-toggle="tab">@T("Tab-5")</a></li>}
+                            @if (!String.IsNullOrEmpty(Model.Tab06)) { <li><a href="#tab_detail6" data-toggle="tab">@T("Tab-6")</a></li>}
+                            @if (!String.IsNullOrEmpty(Model.Tab07)){ <li><a href="#tab_detail7" data-toggle="tab">@T("Tab-7")</a></li> }
+                            @if (!String.IsNullOrEmpty(Model.Tab08)){<li><a href="#tab_detail8" data-toggle="tab">@T("Tab-8")</a></li>}
+                            @if (!String.IsNullOrEmpty(Model.Tab09)){<li><a href="#tab_detail9" data-toggle="tab">@T("Tab-9")</a></li>}
+                            @if (!String.IsNullOrEmpty(Model.Tab10)){<li><a href="#tab_detail10" data-toggle="tab">@T("Tab-10")</a></li>}
+                          
+                        </ul>
+                        <div id="myTabContent" class="tab-content">
+                            <div class="tab-pane active in" id="tab_detail1">
+                                @if (!String.IsNullOrEmpty(Model.FullDescription))
+                                {
+                                    <div class="full-description" itemprop="description">
+                                        @Html.Raw(Model.FullDescription)
+                                    </div>
+                                }
+                            </div>
+                            <div class="tab-pane fade" id="tab_detail2">
+                                @if (!String.IsNullOrEmpty(Model.Specifications))
+                                {
+                                    <div class="full-description" itemprop="fieldwork">
+                                        @Html.Raw(Model.Specifications)
+                                    </div>
+                                }
+                            </div>
+                            <div class="tab-pane fade" id="tab_detail3">
+                                @if (Model.PictureModels.Count > 1)
+                                {
+                                    <div class="full-description" itemprop="functions">
+                                        <ul class="img-product-detail">
+                                            @foreach (var picture in Model.PictureModels)
+                                            {
+                                                <li>
+                                                    <img width="255" height="300" src="@picture.FullSizeImageUrl" alt="@picture.AlternateText" title="@picture.Title" />
+                                                    <span>@picture.Title</span>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                }
+                            </div>
+                            <div class="tab-pane fade" id="tab_detail4">
+                                <!--sample download-->
+                                @Html.Partial("_DownloadSample", Model)
+                            </div>
+                            <div class="tab-pane fade" id="tab_detail5">
+                                @if (!String.IsNullOrEmpty(Model.Applications))
+                                {
+                                    <div class="full-description" itemprop="fieldwork">
+                                        @Html.Raw(Model.Applications)
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="tab-pane fade" id="tab_detail6">
+                                @if (!String.IsNullOrEmpty(Model.Tab06))
+                                {
+                                    <div class="full-description" itemprop="fieldwork">
+                                        @Html.Raw(Model.Tab06)
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="tab-pane fade" id="tab_detail7">
+                                @if (!String.IsNullOrEmpty(Model.Tab07))
+                                {
+                                    <div class="full-description" itemprop="fieldwork">
+                                        @Html.Raw(Model.Tab07)
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="tab-pane fade" id="tab_detail8">
+                                @if (!String.IsNullOrEmpty(Model.Tab08))
+                                {
+                                    <div class="full-description" itemprop="fieldwork">
+                                        @Html.Raw(Model.Tab08)
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="tab-pane fade" id="tab_detail9">
+                                @if (!String.IsNullOrEmpty(Model.Tab09))
+                                {
+                                    <div class="full-description" itemprop="fieldwork">
+                                        @Html.Raw(Model.Tab09)
+                                    </div>
+                                }
+                            </div>
+                            <div class="tab-pane fade" id="tab_detail10">
+                                @if (!String.IsNullOrEmpty(Model.Tab10))
+                                {
+                                    <div class="full-description" itemprop="fieldwork">
+                                        @Html.Raw(Model.Tab10)
+                                    </div>
+                                }
+                            </div>
+
+
+                        </div>
+                    </div>
+                    
+                </div>
+                @Html.Widget("productdetails_before_collateral", Model.Id)
+                @Html.Action("RelatedProducts", "Product", new { productId = Model.Id })
+            </div>
+        }
+        @Html.Widget("productdetails_bottom", Model.Id)
+    </div>
+</div>

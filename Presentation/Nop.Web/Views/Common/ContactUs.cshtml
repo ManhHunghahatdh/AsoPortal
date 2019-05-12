@@ -1,0 +1,88 @@
+﻿@model ContactUsModel
+@using Nop.Web.Models.Common;
+@{
+    Layout = "~/Views/Shared/_ColumnsOne.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.ContactUs").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-contact-page");
+}
+@section Breadcrumb_line {
+    <div class="headtitle">
+        <div class="container_aso">
+            <h2 class="title">@T("Title.ContactUs")<h2>
+        </div>
+    </div>
+}
+<div class="page contact-page">
+    <div class="page-title" id="ph-title">
+        <h1>@T("alert-contact") </h1>
+    </div>
+    <div class="page-body">
+        @Html.Action("TopicBlock", "Topic", new { systemName = "ContactUs" })
+        @Html.Widget("contactus_top")
+        @if (Model.SuccessfullySent)
+        {
+            <div class="result">
+                @Model.Result
+            </div>
+        }
+        else
+        {
+            using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                var validationSummary = Html.ValidationSummary(true);
+                if (!MvcHtmlString.IsNullOrEmpty(validationSummary))
+                {
+                    <div class="message-error">@validationSummary</div>
+                }
+                <div class="fieldset">
+                    <div class="form-fields">
+                        <div>
+                            @Html.LabelFor(model => model.FullName)
+                            @Html.RequiredHint() @Html.ValidationMessageFor(model => model.FullName)
+                            @Html.TextBoxFor(model => model.FullName, new { @class = "fullname form-control", placeholder ="" })
+                           
+                        </div>
+                        <div>
+                            @Html.LabelFor(model => model.Email)
+                            @Html.RequiredHint()
+                            @Html.ValidationMessageFor(model => model.Email)
+                            @Html.TextBoxFor(model => model.Email, new { @class = "email form-control" })
+                            
+                          
+                        </div>
+                        @if (Model.SubjectEnabled)
+                        {
+                            <div>
+                                @Html.LabelFor(model => model.Subject)
+                                @Html.RequiredHint()
+                                @Html.ValidationMessageFor(model => model.Subject)
+                                @Html.TextBoxFor(model => model.Subject, new { @class = "subject form-control" })
+                            </div>
+                        }
+                        <div>
+                            @Html.LabelFor(model => model.Enquiry)
+                            @Html.RequiredHint()
+                            @Html.ValidationMessageFor(model => model.Enquiry)
+                            @Html.TextAreaFor(model => model.Enquiry, new { @class = "enquiry form-control" })
+
+                        </div>
+                        @if (Model.DisplayCaptcha)
+                        {
+                            <div class="captcha-box">
+                                @Html.Raw(Html.GenerateCaptcha())
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="buttons" id="page-detail-button">
+                    <input type="submit" name="send-email" class="button-1 contact-us-button" value="@T("ContactUs.Button")" />
+                </div>
+            }
+        }
+        @Html.Widget("contactus_bottom")
+    </div>
+</div>
